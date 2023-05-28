@@ -66,7 +66,7 @@ public class WhatsAppController : Controller
                 _logger.LogError("Falha ao enviar mensagem para o número: {phoneNumber}, StatusCode: {statusCode}, ErrorMessage: {errorMessage}", phoneNumber, response.StatusCode, response.ErrorMessage);
             }
 
-            Thread.Sleep(8000); // Aguarda 5 segundos antes da próxima iteração
+            Thread.Sleep(10000); // Aguarda 5 segundos antes da próxima iteração
         }
 
         TempData["Success"] = "Mensagens enviadas com sucesso para todos os números.";
