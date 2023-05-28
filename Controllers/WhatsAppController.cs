@@ -16,17 +16,13 @@ public class WhatsAppController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        
-
         var message = new WhatsAppMessage
         {
-            
             Message = "Digite sua mensagem!"
         };
 
         return View(message);
     }
-
 
     [HttpPost]
     public IActionResult SendMessage(WhatsAppMessage msg)
@@ -66,7 +62,7 @@ public class WhatsAppController : Controller
                 _logger.LogError("Falha ao enviar mensagem para o número: {phoneNumber}, StatusCode: {statusCode}, ErrorMessage: {errorMessage}", phoneNumber, response.StatusCode, response.ErrorMessage);
             }
 
-            Thread.Sleep(9000); // Aguarda 5 segundos antes da próxima iteração
+            Thread.Sleep(5000); // Aguarda 5 segundos antes da próxima iteração
         }
 
         TempData["Success"] = "Mensagens enviadas com sucesso para todos os números.";
@@ -74,4 +70,18 @@ public class WhatsAppController : Controller
         return RedirectToAction("Index");
     }
 
+    [HttpGet]
+    public IActionResult RegisterPhoneNumber(string key)
+    {
+        var token = "RANDOM_STRING_HERE_RANDOM123"; // Substitua pela sua lógica para gerar um token aleatório
+        var url = $"http://localhost:3333/instance/init?token={token}&key={key}";
+        return Redirect(url);
+    }
+
+    [HttpGet]
+    public IActionResult ScanQR(string key)
+    {
+        var url = $"http://localhost:3333/instance/scan-qr?key={key}";
+        return Redirect(url);
+    }
 }
