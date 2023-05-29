@@ -1,3 +1,5 @@
+@model MassWhatsAppSite.Models.WhatsAppMessage
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,14 +18,14 @@
             margin: 0 auto;
             padding: 20px;
             display: flex;
+            flex-direction: column;
         }
 
         .section {
-            flex: 1;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            margin: 0 10px;
+            margin-bottom: 10px;
         }
 
         .section h2 {
@@ -77,11 +79,13 @@
         .alert-success {
             background-color: #dff0d8;
             color: #3c763d;
+            margin-bottom: 10px;
         }
 
         .alert-danger {
             background-color: #f2dede;
             color: #a94442;
+            margin-bottom: 10px;
         }
 
         .qrcode {
@@ -96,74 +100,92 @@
 </head>
 <body>
     <div class="container">
-        <div class="section">
-            <h2>Register Phone</h2>
-
-            <form asp-controller="Home" asp-action="RegisterPhoneNumber" method="post">
-                <div class="form-group">
-                    <label for="phoneNumber">Phone Number</label>
-                    <input class="form-control" type="text" id="phoneNumber" name="phoneNumber" required>
-                </div>
-                <div class="form-group">
-                    <label for="apiKey">API Key (Nickname)</label>
-                    <input class="form-control" type="text" id="apiKey" name="apiKey" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Register Phone</button>
-            </form>
-        </div>
-
-        <div class="section">
-            <h2>QR Code</h2>
-
-            <div class="qrcode">
-                @if(!string.IsNullOrEmpty(ViewBag.QRCodeUrl))
-                {
-                    <img src="@ViewBag.QRCodeUrl" alt="QR Code">
-                }
-                else
-                {
-                    <p>No QR Code available</p>
-                }
+        @if (!string.IsNullOrEmpty(TempData["Success"] as string))
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
             </div>
-        </div>
+        }
 
-        <div class="section">
-            <h2>Send Message</h2>
+        @if (!string.IsNullOrEmpty(TempData["Error"] as string))
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }
 
-            @if(TempData["Success"] != null)
-            {
-                <div class="alert alert-success">
-                    @TempData["Success"]
-                </div>
-            }
+        <input type="hidden" id="apiKeyHidden" name="apiKeyHidden" value="@ViewBag.APIKeyHidden">
+        <table>
+            <tr>
+                <td>
+                    <div class="section">
+                        <h2>Register Phone</h2>
 
-            @if(TempData["Error"] != null)
-            {
-                <div class="alert alert-danger">
-                    @TempData["Error"]
-                </div>
-            }
+                        <form asp-controller="WhatsApp" asp-action="RegisterPhoneNumber" method="get">
+                            <div class="form-group">
+                                <label for="phoneNumber">Phone Number</label>
+                                <input class="form-control" type="text" id="phoneNumber" name="phoneNumber" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="apiKey">API Key (Nickname)</label>
+                                <input class="form-control" type="text" id="apiKey" name="apiKey" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Register Phone</button>
+                        </form>
+                    </div>
+                </td>
+                <td>
+                    <div class="section">
+                        <h2>QR Code</h2>
 
-            <form asp-controller="WhatsApp" asp-action="SendMessage" method="post">
-                <div class="form-group">
-                    <label for="phoneNumbers">Phone Numbers</label>
-                    <textarea class="form-control" id="phoneNumbers" name="PhoneNumbers"></textarea>
-                    <small class="form-text text-muted">Enter one phone number per line.</small>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea class="form-control" id="message" name="Message"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Send Message</button>
-            </form>
+                        <div class="qrcode">
+                            @if (!string.IsNullOrEmpty(TempData["QRCodeBase64"] as string))
+                            {
+                                <img src='data:image/png;base64,@TempData["QRCodeBase64"]' alt='QR Code'>
 
-            @if(TempData["Success"] != null)
-            {
-                <div class="alert alert-success mt-3">
-                    @TempData["Success"]
+                            }
+                            else
+                            {
+                                <p>No QR Code available</p>
+                            }
+                        </div>
+
+
+                        <form asp-controller="WhatsApp" asp-action="ScanQR" method="get">
+                            <button type="submit" class="btn btn-primary">Scan QR Code</button>
+                        </form>
+                    </div>
+
                 </div>
-            }
-        </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="section">
+                        <h2>Send Message</h2>
+
+                        <form asp-controller="WhatsApp" asp-action="SendMessage" method="post">
+                            <div class="form-group">
+                                <label for="phoneNumbers">Phone Numbers</label>
+                                <textarea class="form-control" id="phoneNumbers" name="PhoneNumbers"></textarea>
+                                <small class="form-text text-muted">Enter one phone number per line.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea class="form-control" id="message" name="Message"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
+
+    <script>
+        document.getElementById("apiKey").addEventListener("input", function() {
+            document.getElementById("apiKeyHidden").value = this.value;
+        });
+    </script>
 </body>
 </html>
