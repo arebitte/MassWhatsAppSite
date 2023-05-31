@@ -85,6 +85,9 @@ public class WhatsAppController : Controller
         {
             apiKeyHidden = apiKey;
             return RedirectToAction("Index");
+
+            // A requisição foi bem-sucedida, definir a mensagem de sucesso
+            TempData["Success"] = "Telefone registrado com sucesso!";
         }
 
 
