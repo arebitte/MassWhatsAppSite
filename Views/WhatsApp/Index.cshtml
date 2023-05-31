@@ -96,114 +96,153 @@
             max-width: 100%;
             height: auto;
         }
+
+        .sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar a {
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
-
-    <div class="section">
-        <h2>Ambiente: @Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")</h2>
+    <div class="sidebar">
+        @* <a href="#" onclick="toggleDiv('registerDiv')">Toggle Register</a> *@
+        <a href="#" onclick="Exibe('passo1')">Passo 1</a>
+        <a href="#" onclick="Exibe('passo2')">Passo 2</a>
+        <a href="#" onclick="Exibe('passo3')">Passo 3</a>
+        <a href="#" onclick="Exibe('passo4')">Passo 4</a>
     </div>
 
-
+@*     <div class="section">
+        <h2>Ambiente: @Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")</h2>
+    </div> *@
 
     <div class="container">
-        @if (!string.IsNullOrEmpty(TempData["Success"] as string))
-        {
-            <div class="alert alert-success">
-                @TempData["Success"]
-            </div>
-        }
-
-        @if (!string.IsNullOrEmpty(TempData["Error"] as string))
-        {
-            <div class="alert alert-danger">
-                @TempData["Error"]
-            </div>
-        }
-
-        <input type="hidden" id="apiKeyHidden" name="apiKeyHidden" value="@ViewBag.APIKeyHidden">
-        <table>
-            <tr>
-                <td>
-                    <div class="section">
-                        <h2>Passo 1 - Registrar o Telefone</h2>
-
-                        <form asp-controller="WhatsApp" asp-action="RegisterPhoneNumber" method="get">
-                            <div class="form-group">
-                                <label for="phoneNumber">Phone Number</label>
-                                <input class="form-control" type="text" id="phoneNumber" name="phoneNumber" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="apiKey">API Key (Nickname)</label>
-                                <input class="form-control" type="text" id="apiKey" name="apiKey" required>
-                                <p>Guarde essa informação, ela será importante para novos envios.</p>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Register Phone</button>
-                        </form>
-                    </div>
-                </td>
-                <td>
-                    <div class="section">
-                        <h2>Passo 2 - Ler o QR Code</h2>
-
-                        <div class="qrcode">
-                            @if (!string.IsNullOrEmpty(TempData["QRCodeBase64"] as string))
-                            {
-                                <img src='data:image/png;base64,@TempData["QRCodeBase64"]' alt='QR Code'>
-
-                            }
-                            else
-                            {
-                                <p>No QR Code available</p>
-                            }
-                        </div>
-
-
-                        <form asp-controller="WhatsApp" asp-action="ScanQR" method="get">
-                            <button type="submit" class="btn btn-primary">Scan QR Code</button>
-                        </form>
-                    </div>
-
+        <div id="registerDiv">
+            @if (!string.IsNullOrEmpty(TempData["Success"] as string))
+            {
+                <div class="alert alert-success">
+                    @TempData["Success"]
                 </div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <div class="section">
-                        <h2>Passo 3 - Eviar Mensagem</h2>
+            }
 
-                        <form asp-controller="WhatsApp" asp-action="SendMessage" method="post">
-                            <div class="form-group">
-                                <label for="phoneNumbers">Phone Numbers</label>
-                                <textarea class="form-control" id="phoneNumbers" name="PhoneNumbers"></textarea>
-                                <small class="form-text text-muted">Enter one phone number per line.</small>
+            @if (!string.IsNullOrEmpty(TempData["Error"] as string))
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
+            <input type="hidden" id="apiKeyHidden" name="apiKeyHidden" value="@ViewBag.APIKeyHidden">
+            <table>
+                <tr>
+                    <td>
+                        <div class="section hidden"  id="passo1">
+                            <h2>Passo 1 - Registrar o Telefone</h2>
+
+                            <form asp-controller="WhatsApp" asp-action="RegisterPhoneNumber" method="get">
+                                <div class="form-group">
+                                    <label for="phoneNumber">Phone Number</label>
+                                    <input class="form-control" type="text" id="phoneNumber" name="phoneNumber" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="apiKey">API Key (Nickname)</label>
+                                    <input class="form-control" type="text" id="apiKey" name="apiKey" required>
+                                    <p>Guarde essa informação, ela será importante para novos envios.</p>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Register Phone</button>
+                            </form>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="section hidden"  id="passo2">
+                            <h2>Passo 2 - Ler o QR Code</h2>
+
+                            <div class="qrcode">
+                                @if (!string.IsNullOrEmpty(TempData["QRCodeBase64"] as string))
+                                {
+                                    <img src='data:image/png;base64,@TempData["QRCodeBase64"]' alt='QR Code'>
+                                }
+                                else
+                                {
+                                    <p>No QR Code available</p>
+                                }
                             </div>
-                            <div class="form-group">
-                                <label for="message">Message</label>
-                                <textarea class="form-control" id="message" name="Message"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Send Message</button>
-                        </form>
+
+                            <form asp-controller="WhatsApp" asp-action="ScanQR" method="get">
+                                <button type="submit" class="btn btn-primary">Scan QR Code</button>
+                            </form>
+                        </div>
                     </div>
-                </td>
-            </tr>
-        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="section hidden"  id="passo3">
+                            <h2>Passo 3 - Enviar Mensagem</h2>
+
+                            <form asp-controller="WhatsApp" asp-action="SendMessage" method="post">
+                                <div class="form-group">
+                                    <label for="phoneNumbers">Phone Numbers</label>
+                                    <textarea class="form-control" id="phoneNumbers" name="PhoneNumbers"></textarea>
+                                    <small class="form-text text-muted">Enter one phone number per line.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="message">Message</label>
+                                    <textarea class="form-control" id="message" name="Message"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section hidden"  id="passo4">
+            <h2>Reutilizar API KEY - <span id="apiKeyTitle">@ViewBag.APIKeyHidden</span></h2>
+
+            <form asp-controller="WhatsApp" asp-action="EnterAPIKEY" method="get">
+                <div class="form-group">
+                    <label for="apiKey">API Key (Nickname)</label>
+                    <input class="form-control" type="text" id="apiKey" name="apiKey" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Registrar</button>
+            </form>
+        </div>
     </div>
 
-    <div class="section">
-                        <h2>Reutilizar API KEY - <span id="apiKeyTitle">@ViewBag.APIKeyHidden</span></h2>
-
-                        <form asp-controller="WhatsApp" asp-action="EnterAPIKEY" method="get">
-                            <div class="form-group">
-                                <label for="apiKey">API Key (Nickname)</label>
-                                <input class="form-control" type="text" id="apiKey" name="apiKey" required>
-                    
-                            </div>
-                            <button type="submit" class="btn btn-primary">Registrar</button>
-                        </form>
-                    </div>
-
     <script>
+        function toggleDiv(divId) {
+            var div = document.getElementById(divId);
+            if (div.style.display === "none") {
+                div.style.display = "block";
+            } else {
+                div.style.display = "none";
+            }
+        }
+
+        function Exibe(divId) {
+        var div = document.getElementById(divId);
+        div.classList.toggle("hidden");
+        }
+
+
         document.getElementById("apiKey").addEventListener("input", function() {
             document.getElementById("apiKeyHidden").value = this.value;
         });
