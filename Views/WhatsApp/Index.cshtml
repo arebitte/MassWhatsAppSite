@@ -121,6 +121,7 @@
 </head>
 <body>
     <div class="sidebar">
+        <small class="form-text text-muted">Clique nos passos para ligar/desligar as funções</small>
         @* <a href="#" onclick="toggleDiv('registerDiv')">Toggle Register</a> *@
         <a href="#" onclick="Exibe('passo1')">Passo 1</a>
         <a href="#" onclick="Exibe('passo2')">Passo 2</a>
@@ -157,15 +158,17 @@
 
                             <form asp-controller="WhatsApp" asp-action="RegisterPhoneNumber" method="get">
                                 <div class="form-group">
-                                    <label for="phoneNumber">Phone Number</label>
+                                    <label for="phoneNumber">Número do WhatsApp</label>
                                     <input class="form-control" type="text" id="phoneNumber" name="phoneNumber" required>
+                                    <p>Digite o telefone no Formato 55YYXXXXXXXXX</p> 
                                 </div>
                                 <div class="form-group">
-                                    <label for="apiKey">API Key (Nickname)</label>
+                                    <label for="apiKey">API Key (Apelido do telefone)</label>
                                     <input class="form-control" type="text" id="apiKey" name="apiKey" required>
-                                    <p>Guarde essa informação, ela será importante para novos envios.</p>
+                                    <p>Crie um nome fácil e significativo. Guarde essa informação, ela será importante para novos envios.</p>
+                                    <p>Ex.: Telefone_JOAO</p>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Register Phone</button>
+                                <button type="submit" class="btn btn-primary">Registrar telefone</button>
                             </form>
                         </div>
                     </td>
@@ -181,6 +184,7 @@
                                 else
                                 {
                                     <p>No QR Code available</p>
+                                    <p>Prepare a leitura do QRCode antes de clicar no botão</p>
                                 }
                             </div>
 
@@ -198,15 +202,16 @@
 
                             <form asp-controller="WhatsApp" asp-action="SendMessage" method="post">
                                 <div class="form-group">
-                                    <label for="phoneNumbers">Phone Numbers</label>
+                                    <label for="phoneNumbers">Números WhatsApp</label>
                                     <textarea class="form-control" id="phoneNumbers" name="PhoneNumbers"></textarea>
-                                    <small class="form-text text-muted">Enter one phone number per line.</small>
+                                    <small class="form-text text-muted">Entre com um número a cada linha</small>
                                 </div>
                                 <div class="form-group">
                                     <label for="message">Message</label>
                                     <textarea class="form-control" id="message" name="Message"></textarea>
+                                    <p>Cole aqui sua mensagem de texto</p>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Send Message</button>
+                                <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
                             </form>
                         </div>
                     </td>
@@ -219,8 +224,9 @@
 
             <form asp-controller="WhatsApp" asp-action="EnterAPIKEY" method="get">
                 <div class="form-group">
-                    <label for="apiKey">API Key (Nickname)</label>
+                    <label for="apiKey">API Key (Apelido do telefone)</label>
                     <input class="form-control" type="text" id="apiKey" name="apiKey" required>
+                    <p>Digite o nome que você escolheu quando registrou o telefone no passo 1</p>
                 </div>
                 <button type="submit" class="btn btn-primary">Registrar</button>
             </form>
