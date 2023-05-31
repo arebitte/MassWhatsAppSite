@@ -28,7 +28,10 @@ public class WhatsAppController : Controller
             Message = "Digite sua mensagem!"
         };
 
+        ViewBag.APIKeyHidden = TempData["APIKey"] as string; 
+
         return View(message);
+        
     }
 
     [HttpPost]
@@ -84,10 +87,12 @@ public class WhatsAppController : Controller
         public IActionResult EnterAPIKEY(string apiKey)
         {
             apiKeyHidden = apiKey;
+
+            TempData["APIKey"] = apiKey;
+            
             return RedirectToAction("Index");
 
-            // A requisição foi bem-sucedida, definir a mensagem de sucesso
-            TempData["Success"] = "Telefone registrado com sucesso!";
+
         }
 
 
@@ -96,6 +101,7 @@ public class WhatsAppController : Controller
     public IActionResult RegisterPhoneNumber(string phoneNumber, string apiKey)
     {
         apiKeyHidden = apiKey;
+        TempData["apiKeyHidden"] = apiKey;
 
         var token = "RANDOM_STRING_HERE_RANDOM123"; // Substitua pela sua lógica para gerar um token aleatório
         var apiUrl = _configuration.GetValue<string>("UrlApiWhatsapp");
