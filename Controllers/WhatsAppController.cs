@@ -5,16 +5,20 @@ using RestSharp;
 using System;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 
 public class WhatsAppController : Controller
 {
     private readonly ILogger<WhatsAppController> _logger;
-    private static string apiKeyHidden;
+    private readonly IConfiguration _configuration;
 
-    public WhatsAppController(ILogger<WhatsAppController> logger)
+    public WhatsAppController(ILogger<WhatsAppController> logger, IConfiguration configuration)
     {
         _logger = logger;
+        _configuration = configuration; 
     }
+
+    private static string apiKeyHidden;
 
     [HttpGet]
     public IActionResult Index()
@@ -40,7 +44,10 @@ public class WhatsAppController : Controller
 
         var phoneNumbers = msg.PhoneNumbers.Split('\n').Select(n => n.Trim()).ToList();
 
-        var client = new RestClient("http://localhost:3333/message/text?key=" + apiKeyHidden);
+        var apiUrl = _configuration.GetValue<string>("UrlApiWhatsapp");
+        var url = $"{apiUrl}/message/text?key=" + apiKeyHidden;
+
+        var client = new RestClient(url);
         var request = new RestRequest();
         request.Method = Method.Post;
         request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -74,12 +81,22 @@ public class WhatsAppController : Controller
     }
 
     [HttpGet]
+        public IActionResult EnterAPIKEY(string apiKey)
+        {
+            apiKeyHidden = apiKey;
+            return RedirectToAction("Index");
+        }
+
+
+
+    [HttpGet]
     public IActionResult RegisterPhoneNumber(string phoneNumber, string apiKey)
     {
         apiKeyHidden = apiKey;
 
         var token = "RANDOM_STRING_HERE_RANDOM123"; // Substitua pela sua lógica para gerar um token aleatório
-        var url = $"http://localhost:3333/instance/init?token={token}&key={apiKey}";
+        var apiUrl = _configuration.GetValue<string>("UrlApiWhatsapp");
+        var url = $"{apiUrl}/instance/init?token={token}&key={apiKey}";
 
         // Fazer o post na API
         var register = new RestClient(url);
@@ -108,7 +125,8 @@ public class WhatsAppController : Controller
     [HttpGet]
     public IActionResult ScanQR()
     {
-        var url = $"http://localhost:3333/instance/qrbase64?key={apiKeyHidden}";
+        var apiUrl = _configuration.GetValue<string>("UrlApiWhatsapp");
+        var url = $"{apiUrl}/instance/qrbase64?key={apiKeyHidden}";
 
         // Fazer o post na API
         var scan = new RestClient(url);
@@ -132,13 +150,11 @@ public class WhatsAppController : Controller
             //string qrCodeBase64 = "";//Convert.ToBase64String(qrCodeImage);
             int index = qrCodeImage.IndexOf(";base64,");
 
-            string qrCodeImage_esq = qrCodeImage.Substring(index+8);
+            string qrCodeImage_esq = qrCodeImage.Substring(index + 8);
 
             int index2 = qrCodeImage_esq.IndexOf("}");
 
-            string qrCodeBase64 = qrCodeImage_esq.Substring(0,index2-1);
-
-            
+            string qrCodeBase64 = qrCodeImage_esq.Substring(0, index2 - 1);
 
             //qrCodeBase64 = qrCodeBase64_SP;
 
@@ -153,5 +169,4 @@ public class WhatsAppController : Controller
 
         return RedirectToAction("Index");
     }
-
 }
