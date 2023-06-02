@@ -89,7 +89,7 @@ public class WhatsAppController : Controller
 
                 if (count == 5)
                 {
-                    await Task.Delay(40000);
+                    await Task.Delay(60000);
                     count = 0;
                 }
         
