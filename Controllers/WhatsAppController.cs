@@ -11,6 +11,7 @@ public class WhatsAppController : Controller
 {
     private readonly ILogger<WhatsAppController> _logger;
     private readonly IConfiguration _configuration;
+    private Boolean visivel;
 
     public WhatsAppController(ILogger<WhatsAppController> logger, IConfiguration configuration)
     {
@@ -30,12 +31,16 @@ public class WhatsAppController : Controller
 
         ViewBag.APIKeyHidden = TempData["APIKey"] as string; 
 
+
+
+    
         return View(message);
         
     }
 
     [HttpPost]
-    public IActionResult SendMessage(WhatsAppMessage msg)
+    //public IActionResult SendMessage(WhatsAppMessage msg)
+    public async Task<IActionResult> SendMessage(WhatsAppMessage msg)
     {
         _logger.LogInformation("SendMessage chamado com a mensagem: {message}", msg);
 
@@ -55,27 +60,42 @@ public class WhatsAppController : Controller
         request.Method = Method.Post;
         request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 
+        var count = 0;
+
         foreach (var phoneNumber in phoneNumbers)
         {
-            var newRequest = new RestRequest();
-            newRequest.Method = Method.Post;
-            newRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+         
+                var newRequest = new RestRequest();
+                newRequest.Method = Method.Post;
+                newRequest.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            newRequest.AddParameter("id", phoneNumber);
-            newRequest.AddParameter("message", msg.Message);
+                newRequest.AddParameter("id", phoneNumber);
+                newRequest.AddParameter("message", msg.Message);
 
-            RestResponse response = client.Execute(newRequest);
+                RestResponse response = client.Execute(newRequest);
 
-            if (response.IsSuccessful)
-            {
-                _logger.LogInformation("Mensagem enviada com sucesso para o número: {phoneNumber}", phoneNumber);
-            }
-            else
-            {
-                _logger.LogError("Falha ao enviar mensagem para o número: {phoneNumber}, StatusCode: {statusCode}, ErrorMessage: {errorMessage}", phoneNumber, response.StatusCode, response.ErrorMessage);
-            }
+                if (response.IsSuccessful)
+                {
+                    _logger.LogInformation("Mensagem enviada com sucesso para o número: {phoneNumber} - Data e Hora: {dateTime}", phoneNumber, DateTime.Now);
 
-            Thread.Sleep(9000);
+                }
+                else
+                {
+                    _logger.LogError("Falha ao enviar mensagem para o número: {phoneNumber}, StatusCode: {statusCode}, ErrorMessage: {errorMessage}", phoneNumber, response.StatusCode, response.ErrorMessage);
+                }
+
+                await Task.Delay(15000);
+                count++;
+
+                if (count == 5)
+                {
+                    await Task.Delay(40000);
+                    count = 0;
+                }
+        
+                
+  
+
         }
 
         TempData["Success"] = "Mensagens enviadas com sucesso para todos os números.";
@@ -169,6 +189,7 @@ public class WhatsAppController : Controller
 
             // Armazenar a imagem em base64 no TempData para exibir no frontend
             TempData["QRCodeBase64"] = qrCodeBase64;
+            TempData["ShowDiv"] = true;
         }
         else
         {
@@ -177,5 +198,6 @@ public class WhatsAppController : Controller
         }
 
         return RedirectToAction("Index");
+        
     }
 }
